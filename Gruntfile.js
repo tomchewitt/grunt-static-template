@@ -37,8 +37,12 @@ module.exports = function(grunt) {
 			"images": {
 				src: 		"src/asset/img",
 				dist: 		"dist/asset/img"
+			},
+			"content": {
+				src: 		"src/content",
+				dist: 		"dist"
 			}
-		}
+		},
 
 
 		// #############################################################################
@@ -58,7 +62,7 @@ module.exports = function(grunt) {
 				tasks: ['concat', 'uglify']
 			},
 			html: {
-				files: 'src/content/**',
+				files: '<% dir.content.src %>/**',
 				tasks: ['assemble']
 			},
 			images: {
@@ -142,10 +146,10 @@ module.exports = function(grunt) {
 
 		assemble: {
 			options: {
-				layoutdir: 'src/content/layouts',
-				partials: 'src/content/partials/**/*.{hbs,html}',
-				data: 'src/content/data/**/*.json',
-				helpers: ['handlebars-helper-partial', 'src/content/helpers/**/*.js']
+				layoutdir: '<% dir.content.src %>/layouts',
+				partials: '<% dir.content.src %>/partials/**/*.{hbs,html}',
+				data: '<% dir.content.src %>/data/**/*.json',
+				helpers: ['handlebars-helper-partial', '<% dir.content.src %>/helpers/**/*.js']
 			},
 			build: {
 				options: {
@@ -153,9 +157,9 @@ module.exports = function(grunt) {
 				},
 				files: [{
 					expand: true,
-					cwd: 'src/content/pages',
+					cwd: '<% dir.content.dist %>/pages',
 					src: '**/*.{hbs,html}',
-					dest: '<%= buildDir %>'
+					dest: '<%= dir.content.dist %>'
 				}]
 			}
 		},
@@ -174,9 +178,9 @@ module.exports = function(grunt) {
 				},
 				files: [{
 					expand: true,
-					cwd: 'src/images/',
+					cwd: '<% dir.images.src %>',
 					src: '**/*.{png,jpg,gif}',
-					dest: 'src/images/'
+					dest: '<% dir.images.dist %>'
 				}]
 			}
 		},
@@ -205,6 +209,7 @@ module.exports = function(grunt) {
 
 		concurrent: {
 			dev: ['server', 'watch'],
+			all: ['style', 'script', 'content'],
 			options: { logConcurrentOutput: true }
 		}
 	});
@@ -213,16 +218,9 @@ module.exports = function(grunt) {
 	// #############################################################################
 	// TASKS
 	// #############################################################################
-	grunt.registerTask('build', ['compass', 'autoprefixer', 'uglify', 'assemble',
-		'newer:imagemin', 'rsync:images', 'rsync:fonts',
-		'rsync:downloads']);
-
-	// run the web server
-	grunt.registerTask('server', 'connect:server');
-
-	// register watch and the web server as the default task
-	grunt.registerTask('default', ['concurrent:dev']);
-
-	// register watch and the web server as the default task
+	grunt.registerTask('default', ['concurrent:all']);
+	grunt.registerTask('server', ['connect:server']);
 	grunt.registerTask('style', ['compass', 'autoprefixer']);
+	grunt.registerTask('script', ['concat', 'uglify:custom']);
+	grunt.registerTask('content', ['assemble', 'newer:imagemin']);
 };
