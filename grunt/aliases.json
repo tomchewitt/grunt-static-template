@@ -1,0 +1,17 @@
+{
+	"default": [
+		"concat",
+		"uglify",
+		"imagemin",
+		"sass",
+		"autoprefixer"
+	],
+	"style": [
+		"sass",
+		"autoprefixer"
+	],
+	"script": [
+		"concat",
+		"uglify"
+	]
+}
